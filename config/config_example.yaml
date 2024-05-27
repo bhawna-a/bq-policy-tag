@@ -1,0 +1,112 @@
+project_id: rational-photon-262214
+region: europe-west2
+# tf_service_account: kavishan.prabarajah@accenture.com
+taxonomy:
+  - id: consumer_segment
+    description: Individual customers
+    activated_policy_types: ["FINE_GRAINED_ACCESS_CONTROL"]
+    policy_tags:
+      - id: severity_high
+        description: Highly sensitive personal information might be present, including credit card numbers and certain national identifiers.
+        level_one:
+          - id: pii
+            description: Personally Identifiable Information
+            level_two:
+              - id: customer_account_number
+                description: customer account number linked to billing
+                level_three:
+                  - id: verification
+                    description: verification method
+                    level_four:
+                      - id: memorable_pass
+                        description: memorable password
+                      - id: card_details
+                        description: Card details for billing
+              - id: first_name
+                description: first name
+              - id: last_name
+                description: last name
+              - id: email
+                description: email
+              - id: address
+                description: address
+              - id: imei
+                description: imei number
+              - id: ni_number
+                description: National Insurance number
+          - id: phone_number
+            description: Phone number
+            level_two:
+              - id: device_model
+                description: phone model
+      - id: severity_low
+        description: low level sensitivity data
+        level_one:
+          - id: customer_perference
+            description: Newsletter subscription perference
+          - id: loyalty_programme
+            description: loyalty programme
+            level_two:
+              - id: loyalty_program_membership_type
+                description: loyalty programme type
+  - id: business_segment
+    description: Business Segment.
+    activated_policy_types: ["POLICY_TYPE_UNSPECIFIED"]
+    policy_tags:
+      - id: company_id
+        description: unique business identifier
+        level_one:
+          - id: company_name
+            description: company name stats
+            level_two:
+              - id: customer_since
+                description: Customer since
+              - id: discount
+                description: discount rate
+          - id: poc
+            description: point of contact
+          - id: subscription_duration
+            description: duration of the payment - monthly or yearly
+  - id: wholesale_segment
+    description: Wholesame segment - to other telecom providers.
+    activated_policy_types: ["POLICY_TYPE_UNSPECIFIED"]
+    policy_tags:
+      - id: public
+        description: This type of data is freely accessible to the public
+security:
+  column_level_sec:
+    - data_policy_id: column_sec_policy
+      policy_tag: customer_account_number
+  masking:
+    - data_policy_id: data_mask_policy
+      policy_tag: customer_account_number
+      masking_rule: ALWAYS_NULL
+    - data_policy_id: mask_credit_account
+      policy_tag: card_details
+      masking_rule: SHA256
+    - data_policy_id: mask_loyalty_prog
+      policy_tag: loyalty_programme
+      masking_rule: DEFAULT_MASKING_VALUE
+iam_roles:
+  masked_reader_policy:
+    - policy_name: customer_account_number
+      members:
+        - user:achal.pandey@accenture.com
+    - policy_name: card_details
+      members:
+        - user:kavishan.prabarajah@accenture.com
+        - user:shweta.a.dixit@accenture.com
+    - policy_name: loyalty_programme
+      members:
+        - user:kavishan.prabarajah@accenture.com
+  finegrained_reader_access:
+    - policy_name: pii
+      members:
+        - user:kavishan.prabarajah@accenture.com
+        - user:shweta.a.dixit@accenture.com
+    - policy_name: severity_low
+      members:
+        - user:achal.pandey@accenture.com
+    - policy_name: discount
+      members:
+        - user:achal.pandey@accenture.com
